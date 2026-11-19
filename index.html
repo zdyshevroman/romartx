@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="ru" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0e0e10">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="ROMARTX">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<title>ROMARTX — генерация изображений</title>
+<style>
+:root{color-scheme:dark;--bg:#0e0e10;--surface:#18181c;--line:#2a2a30;--text:#eeede9;--muted:#8a8a93;--accent:#eeede9;--accent-text:#0e0e10;--art:linear-gradient(135deg,#f6d365,#fd8fa0)}
+[data-theme=light]{color-scheme:light;--bg:#f5f5f3;--surface:#ffffff;--line:#e2e2de;--text:#17171b;--muted:#6f6f78;--accent:#17171b;--accent-text:#ffffff}
+[data-theme=beige]{color-scheme:light;--bg:#f1eadd;--surface:#faf5ec;--line:#dccfba;--text:#3b2f22;--muted:#7f6e5a;--accent:#3b2f22;--accent-text:#f8f1e5}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;height:100vh;height:100dvh;display:flex;flex-direction:column;background:var(--bg);color:var(--text);font:15px/1.45 -apple-system,"Segoe UI",Roboto,Inter,sans-serif}
+button,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+select option{background:var(--surface);color:var(--text)}
+header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:14px 20px;border-bottom:1px solid var(--line)}
+.brand{font-weight:700;letter-spacing:.2em}
+.balance{margin-left:auto;font-size:14px;color:var(--muted)}
+.balance b{color:var(--text);font-weight:600}
+.link{padding:0;background:none;border:0;color:var(--text);text-decoration:underline;font-size:14px}
+.themes{display:flex;gap:8px}
+.themes button{width:18px;height:18px;padding:0;border:1px solid var(--line);border-radius:50%}
+.themes .on{outline:2px solid var(--text);outline-offset:2px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{padding:6px 11px;background:none;border:0;color:var(--muted)}
+.seg .on{background:var(--text);color:var(--bg)}
+.seg button:disabled{opacity:.35;cursor:default}
+main{flex:1;overflow-y:auto;width:100%;max-width:760px;margin:0 auto;padding:24px 20px;display:flex;flex-direction:column;gap:28px}
+.msg{display:flex;flex-direction:column;gap:10px}
+.user{align-self:flex-end;max-width:85%;display:flex;flex-direction:column;gap:8px;padding:12px 14px;background:var(--surface);border:1px solid var(--line);border-radius:16px 16px 4px 16px}
+.meta{font-size:13px;color:var(--muted)}
+.thumbs,.refs{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.ref{position:relative;width:56px;height:56px;flex:none;overflow:hidden;border:1px solid var(--line);border-radius:10px;background-size:cover;background-position:center}
+.sm{width:44px;height:44px}
+.n{position:absolute;left:4px;top:4px;padding:0 5px;border-radius:6px;background:var(--text);color:var(--bg);font-size:11px;line-height:16px}
+.x{position:absolute;right:2px;top:2px;width:18px;height:18px;padding:0;border:0;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;font-size:13px;line-height:16px}
+.load::after{content:"";position:absolute;left:0;bottom:0;height:3px;background:var(--accent);animation:ld .9s linear forwards}
+@keyframes ld{from{width:0}to{width:100%}}
+.result{display:flex;flex-direction:column;overflow:hidden;background:var(--surface);border:1px solid var(--line);border-radius:16px}
+.art{display:block;max-width:100%;margin:0 auto;background:var(--art)}
+.wait{background:linear-gradient(90deg,var(--line) 25%,var(--surface) 50%,var(--line) 75%) 0 0/200% 100%;animation:sh 1.4s linear infinite}
+@keyframes sh{to{background-position:-200% 0}}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 12px}
+.bar .meta{margin-right:auto}
+.dl{padding:5px 10px;background:none;border:1px solid var(--line);border-radius:8px;color:var(--text);font-size:13px}
+footer{padding:12px 20px 16px;border-top:1px solid var(--line)}
+.box{max-width:760px;margin:0 auto;padding:12px;background:var(--surface);border:1px solid var(--line);border-radius:18px}
+.box:focus-within{border-color:var(--muted)}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:10px}
+.chip{flex:none;padding:4px 11px;background:none;border:1px solid var(--line);border-radius:999px;color:var(--muted);font-size:13px}
+.chip.on{color:var(--text);border-color:var(--text)}
+textarea{display:block;width:100%;min-height:44px;max-height:220px;border:0;outline:0;resize:none;background:none}
+textarea::placeholder{color:var(--muted)}
+.hint{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--muted)}
+.refs{margin-top:10px}
+.add{flex:none;width:56px;height:56px;background:none;border:1px dashed var(--muted);border-radius:10px;color:var(--muted);font-size:22px}
+.count{margin-left:auto;font-size:13px;color:var(--muted)}
+.note{min-height:18px;margin:6px 0 0;font-size:12px;color:var(--muted)}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:8px;padding-top:10px;border-top:1px solid var(--line)}
+select{padding:6px 8px;background:none;border:1px solid var(--line);border-radius:10px}
+.go{margin-left:auto;padding:10px 16px;background:var(--accent);color:var(--accent-text);border:0;border-radius:12px;font-weight:600}
+.modal{position:fixed;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.6)}
+.sheet{width:min(420px,100%);max-height:90dvh;overflow-y:auto;display:flex;flex-direction:column;gap:14px;padding:20px;background:var(--surface);border:1px solid var(--line);border-radius:18px}
+.sheet-head{display:flex;align-items:center;justify-content:space-between}
+.sheet label{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted)}
+.sheet input,.sheet textarea{padding:10px 12px;background:none;border:1px solid var(--line);border-radius:10px;color:var(--text);font:inherit}
+.sheet .go{margin-left:0}
+.pay-info{white-space:pre-wrap;word-break:break-word}
+.qr img{display:block;width:100%;max-width:260px;margin:0 auto;border-radius:10px;background:#fff}
+.close{padding:0 6px;background:none;border:0;color:var(--muted);font-size:24px;line-height:1}
+@media (max-width:560px){.go{order:9;width:100%;margin-left:0}.balance{margin-left:0}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">ROMARTX</div>
+  <div class="balance">Баланс <b id="bal"></b> <button class="link" id="topup">пополнить</button></div>
+  <div class="themes">
+    <button class="on" data-t="dark" style="background:#0e0e10" title="Тёмная"></button>
+    <button data-t="light" style="background:#ffffff" title="Светлая"></button>
+    <button data-t="beige" style="background:#f1eadd" title="Бежевая"></button>
+  </div>
+</header>
+
+<main id="feed">
+  <div class="msg">
+    <div class="user">
+      <div class="thumbs">
+        <span class="ref sm" style="background:linear-gradient(135deg,#84fab0,#8fd3f4)"><span class="n">1</span></span>
+        <span class="ref sm" style="background:linear-gradient(135deg,#a18cd1,#fbc2eb)"><span class="n">2</span></span>
+      </div>
+      <div>Уютная кофейня на закате, мягкий свет, акварель</div>
+      <div class="meta">Модель A · 2K · 16:9 · 26 ₽</div>
+    </div>
+    <div class="result">
+      <div class="art" style="aspect-ratio:16 / 9;width:min(100%, calc(60vh * 16 / 9))"></div>
+      <div class="bar">
+        <span class="meta">Готово · списано 26 ₽</span>
+        <button class="dl">PNG</button><button class="dl">JPG</button><button class="dl">WEBP</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="box">
+    <div class="chips">
+      <button class="chip" data-s="фотореализм">Фотореализм</button>
+      <button class="chip" data-s="аниме">Аниме</button>
+      <button class="chip" data-s="минимализм">Минимализм</button>
+      <button class="chip" data-s="3D-рендер">3D</button>
+    </div>
+    <textarea id="ta" rows="1" maxlength="1000" placeholder="Например: уютная кофейня на закате, мягкий свет, акварель" title="Enter — отправить, Shift+Enter — новая строка"></textarea>
+    <div class="hint"><span>Ссылайтесь на референсы номером: «стиль как у 2», «персонаж с фото 1»</span><span id="len">0 / 1000</span></div>
+    <div id="refsWrap">
+      <div class="refs" id="refs"></div>
+      <p class="note" id="note">JPG, PNG, WEBP · до 10 МБ на файл</p>
+    </div>
+    <div class="row">
+      <select id="model">
+        <option value="a">Модель A</option>
+        <option value="b">Модель B</option>
+        <option value="c">Модель C</option>
+      </select>
+      <div class="seg" id="quality"><button data-q="1K">1K</button><button data-q="2K">2K</button><button data-q="4K">4K</button></div>
+      <div class="seg" id="ratio"><button data-r="1:1">1:1</button><button data-r="16:9">16:9</button><button data-r="9:16">9:16</button></div>
+      <button class="go" id="go"></button>
+    </div>
+    <input type="file" id="file" accept="image/*" multiple hidden>
+  </div>
+</footer>
+
+<div class="modal" id="topupModal" hidden>
+  <div class="sheet">
+    <div class="sheet-head"><b>Пополнение баланса</b><button class="close" data-close>×</button></div>
+    <div class="pay-info" id="payInfo"></div>
+    <div class="qr" id="qrWrap"></div>
+  </div>
+</div>
+<form class="modal" id="adminModal" hidden>
+  <div class="sheet">
+    <div class="sheet-head"><b>Админка: оплата</b><button type="button" class="close" data-close>×</button></div>
+    <label>Счёт для перевода
+      <textarea id="cfgAccount" rows="3"></textarea>
+    </label>
+    <label>Ссылка на QR-код
+      <input id="cfgQr" type="url" placeholder="https://...">
+    </label>
+    <button class="go" type="submit">Сохранить</button>
+  </div>
+</form>
+<script>
+const $ = s => document.querySelector(s);
+const MODELS = {
+  a: {name: 'Модель A', q: {'1K': 10, '2K': 20, '4K': 40}, refs: 10, fee: 3},
+  b: {name: 'Модель B', q: {'1K': 15, '2K': 30}, refs: 4, fee: 2},
+  c: {name: 'Модель C', q: {'1K': 8, '2K': 16, '4K': 32}, refs: 0, fee: 0}
+};
+const DEFAULT_NOTE = 'JPG, PNG, WEBP · до 10 МБ на файл';
+const S = {
+  model: 'a', q: '2K', ratio: '16:9', balance: 1224,
+  refs: [
+    {bg: 'linear-gradient(135deg,#84fab0,#8fd3f4)', done: true},
+    {bg: 'linear-gradient(135deg,#a18cd1,#fbc2eb)', done: true},
+    {bg: 'linear-gradient(135deg,#f6d365,#fda085)', done: true}
+  ]
+};
+const fine = matchMedia('(pointer: fine)').matches;
+const money = n => n.toLocaleString('ru-RU') + ' ₽';
+const esc = s => s.replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'})[c]);
+const dims = r => { const [w, h] = r.split(':'); return `aspect-ratio:${w} / ${h};width:min(100%, calc(60vh * ${w} / ${h}))`; };
+const price = () => MODELS[S.model].q[S.q] + MODELS[S.model].fee * S.refs.length;
+
+let noteTimer;
+function note(t) {
+  $('#note').textContent = t;
+  clearTimeout(noteTimer);
+  noteTimer = setTimeout(() => { $('#note').textContent = DEFAULT_NOTE; }, 2000);
+}
+
+function render() {
+  const m = MODELS[S.model];
+  $('#bal').textContent = money(S.balance);
+  $('#go').textContent = `Создать · ${money(price())}`;
+  $('#refsWrap').hidden = !m.refs;
+  document.querySelectorAll('#quality button').forEach(b => {
+    b.disabled = !(b.dataset.q in m.q);
+    b.classList.toggle('on', b.dataset.q === S.q);
+  });
+  document.querySelectorAll('#ratio button').forEach(b => b.classList.toggle('on', b.dataset.r === S.ratio));
+  $('#refs').innerHTML = S.refs.map((r, i) =>
+    `<span class="ref${r.done ? '' : ' load'}" style="background:${r.bg}"><span class="n">${i + 1}</span><button class="x" data-i="${i}">×</button></span>`
+  ).join('')
+    + (S.refs.length < m.refs ? '<button class="add" id="add">+</button>' : '')
+    + `<span class="count">${S.refs.length} / ${m.refs}</span>`;
+}
+
+function addFiles(list) {
+  const m = MODELS[S.model];
+  if (!m.refs || !list.length) return;
+  for (const f of [...list]) {
+    if (!f.type.startsWith('image/')) continue;
+    if (f.size > 10 * 1024 * 1024) { note('Файл больше 10 МБ'); continue; }
+    if (S.refs.length >= m.refs) { note(m.refs === 10 ? 'Максимум 10 референсов' : `Эта модель принимает до ${m.refs}`); break; }
+    const r = {bg: `url(${URL.createObjectURL(f)})`, done: false};
+    S.refs.push(r);
+    setTimeout(() => { r.done = true; render(); }, 900);
+  }
+  render();
+}
+
+function send() {
+  const text = $('#ta').value.trim();
+  const m = MODELS[S.model];
+  const p = price();
+  if (!text) return $('#ta').focus();
+  if (S.refs.some(r => !r.done)) return note('Дождитесь загрузки референсов');
+  if (p > S.balance) return note('Недостаточно средств, пополните баланс');
+  S.balance -= p;
+  const msg = document.createElement('div');
+  msg.className = 'msg';
+  msg.innerHTML = `
+    <div class="user">
+      ${S.refs.length ? `<div class="thumbs">${S.refs.map((r, i) => `<span class="ref sm" style="background:${r.bg}"><span class="n">${i + 1}</span></span>`).join('')}</div>` : ''}
+      <div>${esc(text)}</div>
+      <div class="meta">${m.name} · ${S.q} · ${S.ratio} · ${money(p)}</div>
+    </div>
+    <div class="result">
+      <div class="art wait" style="${dims(S.ratio)}"></div>
+      <div class="bar"><span class="meta">Генерируем…</span></div>
+    </div>`;
+  $('#feed').append(msg);
+  setTimeout(() => {
+    msg.querySelector('.result').innerHTML = `
+      <div class="art" style="${dims(S.ratio)}"></div>
+      <div class="bar"><span class="meta">Готово · списано ${money(p)}</span><button class="dl">PNG</button><button class="dl">JPG</button><button class="dl">WEBP</button></div>`;
+  }, 2000);
+  $('#ta').value = '';
+  $('#ta').dispatchEvent(new Event('input'));
+  render();
+  $('#feed').scrollTop = $('#feed').scrollHeight;
+}
+
+$('#refs').onclick = e => {
+  const x = e.target.closest('.x');
+  if (x) { S.refs.splice(+x.dataset.i, 1); render(); }
+  if (e.target.closest('#add')) $('#file').click();
+};
+$('#file').onchange = e => { addFiles([...e.target.files]); e.target.value = ''; };
+document.addEventListener('dragover', e => e.preventDefault());
+document.addEventListener('drop', e => {
+  if (!e.dataTransfer.files.length) return;
+  e.preventDefault();
+  addFiles([...e.dataTransfer.files]);
+});
+document.addEventListener('paste', e => addFiles([...e.clipboardData.files]));
+$('#model').onchange = e => {
+  S.model = e.target.value;
+  const m = MODELS[S.model];
+  S.refs = S.refs.slice(0, m.refs);
+  if (!(S.q in m.q)) S.q = '2K';
+  render();
+};
+$('#quality').onclick = e => {
+  const q = e.target.dataset.q;
+  if (q && !e.target.disabled) { S.q = q; render(); }
+};
+$('#ratio').onclick = e => {
+  const r = e.target.dataset.r;
+  if (r) { S.ratio = r; render(); }
+};
+document.querySelectorAll('.chip').forEach(c => c.onclick = () => {
+  if (c.classList.contains('on')) return;
+  c.classList.add('on');
+  const ta = $('#ta');
+  ta.value = [ta.value.trim(), c.dataset.s].filter(Boolean).join(', ');
+  ta.dispatchEvent(new Event('input'));
+});
+$('#ta').oninput = e => {
+  e.target.style.height = 'auto';
+  e.target.style.height = Math.min(e.target.scrollHeight, 220) + 'px';
+  $('#len').textContent = `${e.target.value.length} / 1000`;
+};
+$('#ta').onkeydown = e => {
+  if (fine && e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); send(); }
+};
+$('#go').onclick = send;
+const PAY_KEY = 'romartx.payment';
+const loadPay = () => JSON.parse(localStorage.getItem(PAY_KEY) || '{}');
+function openTopup() {
+  const p = loadPay();
+  $('#payInfo').textContent = p.account || 'Реквизиты пока не заданы. Обратитесь к администратору.';
+  $('#qrWrap').innerHTML = p.qr ? `<img src="${esc(p.qr)}" alt="QR-код для оплаты">` : '';
+  $('#topupModal').hidden = false;
+}
+function openAdmin() {
+  const p = loadPay();
+  $('#cfgAccount').value = p.account || '';
+  $('#cfgQr').value = p.qr || '';
+  $('#adminModal').hidden = false;
+}
+$('#topup').onclick = openTopup;
+$('#adminModal').onsubmit = e => {
+  e.preventDefault();
+  localStorage.setItem(PAY_KEY, JSON.stringify({account: $('#cfgAccount').value.trim(), qr: $('#cfgQr').value.trim()}));
+  $('#adminModal').hidden = true;
+};
+document.querySelectorAll('.modal').forEach(m => m.onclick = e => { if (e.target === m) m.hidden = true; });
+document.querySelectorAll('[data-close]').forEach(b => b.onclick = () => { b.closest('.modal').hidden = true; });
+if (location.hash === '#admin') openAdmin();
+document.querySelectorAll('.themes button').forEach(b => b.onclick = () => {
+  document.documentElement.dataset.theme = b.dataset.t;
+  document.querySelectorAll('.themes button').forEach(x => x.classList.toggle('on', x === b));
+});
+render();
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+</script>
+</body>
+</html>
